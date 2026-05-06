@@ -18,7 +18,7 @@ from textual.worker import Worker, WorkerState
 
 from textual_tetris_game.game import (
     Board, Direction, GameState, Rotation, TetrominoType,
-    TETROMINO_SHAPES, hard_drop,  move_tetromino, 
+    TETROMINO_SHAPES, get_ghost_piece, hard_drop, move_tetromino, 
     rotate_tetromino, update_game
 )
 
@@ -61,6 +61,15 @@ class BoardWidget(Static):
             if 0 <= row < self.board_state.height and 0 <= col < self.board_state.width:
                 color = TETROMINO_COLORS.get(tetromino_type, "white")
                 grid[row][col] = f"[on {color}]  [/on {color}]"
+        
+        # Add the ghost piece to the grid
+        if self.current_piece is not None:
+            ghost_piece = get_ghost_piece(self.board_state, self.current_piece)
+            color = TETROMINO_COLORS.get(self.current_piece.type, "white")
+            for cell in ghost_piece.get_cells():
+                if 0 <= cell.row < self.board_state.height and 0 <= cell.col < self.board_state.width:
+                    # Use a shaded character for the ghost piece
+                    grid[cell.row][cell.col] = f"[{color}]▒▒[/{color}]"
         
         # Add the current piece to the grid
         if self.current_piece is not None:

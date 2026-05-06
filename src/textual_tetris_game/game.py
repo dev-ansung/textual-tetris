@@ -384,6 +384,16 @@ def hard_drop(state: GameState) -> GameState:
         current_state = new_state
     
     return current_state
+    
+def get_ghost_piece(board: Board, tetromino: Tetromino) -> Tetromino:
+    """Calculate the ghost piece position for the given tetromino."""
+    ghost = tetromino
+    while True:
+        next_ghost = ghost.move(Direction.DOWN)
+        if not board.is_valid_tetromino(next_ghost):
+            break
+        ghost = next_ghost
+    return ghost
 
 def calculate_score(lines_cleared: int, level: int) -> int:
     """Calculate the score for clearing lines."""
