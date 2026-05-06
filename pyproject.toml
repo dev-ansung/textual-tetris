@@ -1,0 +1,35 @@
+[project]
+name = "textual-tetris-game"
+version = "0.1.0"
+description = "A terminal-based implementation of the classic Tetris game using the Textual framework"
+authors = [
+    { name = "Masahiro Wada", email = "argon.argon.argon@gmail.com" }
+]
+dependencies = [
+    "textual>=2.1.2",
+]
+readme = "README.md"
+requires-python = ">= 3.14"
+[project.scripts]
+tetris = "textual_tetris_game.cli:main"
+cli = "textual_tetris_game.cli:main"
+test = "pytest:console_main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.0.0",
+    "ruff>=0.0.1",
+    "textual-dev>=1.7.0",
+]
+
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/textual_tetris_game"]
