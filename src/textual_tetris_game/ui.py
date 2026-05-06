@@ -22,6 +22,16 @@ from textual_tetris_game.game import (
     rotate_tetromino, update_game
 )
 
+TETROMINO_COLORS = {
+    TetrominoType.I: "#00d1d1", # Cyan
+    TetrominoType.J: "#3b82f6", # Blue
+    TetrominoType.L: "#f59e0b", # Orange
+    TetrominoType.O: "#eab308", # Yellow
+    TetrominoType.S: "#22c55e", # Green
+    TetrominoType.T: "#a855f7", # Purple
+    TetrominoType.Z: "#ef4444", # Red
+}
+
 
 class BoardWidget(Static):
     """Widget that displays the Tetris game board."""
@@ -49,13 +59,15 @@ class BoardWidget(Static):
         # Fill in the cells from the board state
         for (row, col), tetromino_type in self.board_state.cells.items():
             if 0 <= row < self.board_state.height and 0 <= col < self.board_state.width:
-                grid[row][col] = f"[on green]  [/on green]"
+                color = TETROMINO_COLORS.get(tetromino_type, "white")
+                grid[row][col] = f"[on {color}]  [/on {color}]"
         
         # Add the current piece to the grid
         if self.current_piece is not None:
+            color = TETROMINO_COLORS.get(self.current_piece.type, "white")
             for cell in self.current_piece.get_cells():
                 if 0 <= cell.row < self.board_state.height and 0 <= cell.col < self.board_state.width:
-                    grid[cell.row][cell.col] = f"[on green]  [/on green]"
+                    grid[cell.row][cell.col] = f"[on {color}]  [/on {color}]"
         
         # Construct the board string with borders
         board_str = "┌" + "─" * (self.board_state.width * 2) + "┐\n"
@@ -100,11 +112,12 @@ class NextPieceWidget(Static):
             center_row, center_col = 1, 1
         
         # Add the piece to the grid
+        color = TETROMINO_COLORS.get(tetromino_type, "white")
         for row_offset, col_offset in shape:
             row = center_row + row_offset
             col = center_col + col_offset
             if 0 <= row < 2 and 0 <= col < 4:
-                grid[row][col] = f"[on green]  [/on green]"
+                grid[row][col] = f"[on {color}]  [/on {color}]"
         
         # Construct the preview string
         preview_str = "Next:\n\n"
