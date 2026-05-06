@@ -1,82 +1,68 @@
 # Textual Tetris
 
+![Demo](demo.gif)
+
 A terminal-based implementation of the classic Tetris game using the [Textual](https://textual.textualize.io/) framework.
 
+## Features
 
-## Prerequisites
-
-- Python 3.14+
-- [uv](https://docs.astral.sh/uv/) - Python package and dependency manager
-- [textual](https://textual.textualize.io/) - Terminal UI framework
+- **Rich Terminal UI**: Built with the Textual framework for a responsive experience.
+- **Visual Guides**: Includes color-coded tetrominoes and a ghost piece guide.
+- **Game Mechanics**: Features classic Tetris scoring, a leveling system with increasing speed, and next piece preview.
+- **Controls**: Supports standard movement, soft drop, hard drop, and rotation.
+- **Modern Python**: Requires Python 3.14+ and uses `uv` for dependency management.
 
 ## Quick Start
 
-Install `textual-tetris-game` with `uv`:
+Run the game directly with `uv`:
 
 ```bash
-uv tool install git+https://github.com/ar90n/textual-tetris-game
+uvx --from git+https://github.com/dev-ansung/textual-tetris tetris
 ```
 
-Run the game:
-
-```bash
-uv run tetris
-```
-
-Or run with `uvx` without installation:
-
-```bash
-uvx --from git+https://github.com/ar90n/textual-tetris-game tetris
-```
-
-## Usage
-
-### CLI
-
-```bash
-usage: tetris [-h]
-
-A terminal-based Tetris game using the Textual framework.
-
-options:
-  -h, --help  show this help message and exit
-
-Controls:
-  ← / →       Move Left / Right
-  ↓           Soft Drop
-  ↑           Rotate Clockwise
-  Space       Hard Drop
-  P           Pause / Resume
-  Q           Quit
-```
-
-### Controls
+## Controls
 
 | Key | Action |
 |-----|--------|
-| `←` / `→` | Move Left / Right |
-| `↓` | Soft Drop |
-| `↑` | Rotate Clockwise |
+| `Left` / `Right` | Move Left / Right |
+| `Down` | Soft Drop |
+| `Up` | Rotate Clockwise |
 | `Space` | Hard Drop |
 | `P` | Pause / Resume |
 | `Q` | Quit |
 
-### Development
+## Installation and Development
 
-Clone the repository and install dependencies:
+### Prerequisites
 
-```bash
-git clone https://github.com/ar90n/textual-tetris-game
-cd textual-tetris-game
-uv sync
-```
+- Python 3.14+
+- [uv](https://docs.astral.sh/uv/)
+
+### Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/dev-ansung/textual-tetris.git
+   cd textual-tetris
+   ```
+
+2. Install dependencies:
+   ```bash
+   uv sync
+   ```
+
+3. Run the game:
+   ```bash
+   uv run tetris
+   ```
+
+### Testing
 
 Run the test suite:
-
 ```bash
 uv run test
 ```
 
 ## License
 
-[MIT License](LICENSE)
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

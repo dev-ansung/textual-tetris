@@ -59,6 +59,9 @@ class Position:
                 return Position(self.row + 1, self.col)
             case _:
                 return self
+                
+    def __add__(self, other: tuple[int, int]) -> 'Position':
+        return Position(self.row + other[0], self.col + other[1])
 
 
 # Tetromino shape definitions
@@ -265,31 +268,14 @@ def generate_next_piece(board: Board) -> Tetromino:
     return Tetromino(tetromino_type, start_position)
 
 
-def update_game(state: GameState) -> GameState:
-    """Update the game state for one frame."""
-    if state.game_over:
-        return state
-    
-    # If there's no current piece, spawn a new one
-    if state.current_piece is None:
-        # If there's no next piece, generate one
-        if state.next_piece is None:
-            next_piece = generate_next_piece(state.board)
-            return GameState(
-                board=state.board,
-                current_piece=next_piece,
-                next_piece=generate_next_piece(state.board),
-                held_piece=state.held_piece,
-                score=state.score,
-                level=state.level,
-                lines_cleared=state.lines_cleared,
-                game_over=state.game_over
-            )
-        
-        # Use the next piece as the current piece
+def spawn_new_piece(state: GameState) -> GameState:
+    """Spawn a new piece and prepare the next one."""
+    if state.next_piece is None:
+        # Initial spawn
+        next_piece = generate_next_piece(state.board)
         return GameState(
             board=state.board,
-            current_piece=state.next_piece,
+            current_piece=next_piece,
             next_piece=generate_next_piece(state.board),
             held_piece=state.held_piece,
             score=state.score,
@@ -298,8 +284,60 @@ def update_game(state: GameState) -> GameState:
             game_over=state.game_over
         )
     
+    # Use next piece as current
+    return GameState(
+        board=state.board,
+        current_piece=state.next_piece,
+        next_piece=generate_next_piece(state.board),
+        held_piece=state.held_piece,
+        score=state.score,
+        level=state.level,
+        lines_cleared=state.lines_cleared,
+        game_over=state.game_over
+    )
+
+
+def update_game(state: GameState) -> GameState:
+    """Update the game state for one frame."""
+    if state.game_over:
+        return state
+    
+    # If there's no current piece, spawn a new one
+    if state.current_piece is None:
+        return spawn_new_piece(state)
+    
     # Move the current piece down
     return move_tetromino(state, Direction.DOWN)
+
+
+def settle_piece(state: GameState) -> GameState:
+    """Place the current piece on the board, handle clears and scoring."""
+    if state.current_piece is None:
+        return state
+        
+    new_board = state.board.place_tetromino(state.current_piece)
+    new_board, lines_cleared = new_board.clear_lines()
+    
+    # Update stats
+    new_lines_cleared = state.lines_cleared + lines_cleared
+    new_score = state.score + calculate_score(lines_cleared, state.level)
+    new_level = calculate_level(new_lines_cleared)
+    
+    # Check for game over
+    game_over = False
+    if state.next_piece is not None:
+        game_over = check_game_over(new_board, state.next_piece.type)
+    
+    return GameState(
+        board=new_board,
+        current_piece=None, # Will be replaced by next piece in update_game
+        next_piece=state.next_piece,
+        held_piece=state.held_piece,
+        score=new_score,
+        level=new_level,
+        lines_cleared=new_lines_cleared,
+        game_over=game_over
+    )
 
 
 def move_tetromino(state: GameState, direction: Direction) -> GameState:
@@ -322,29 +360,7 @@ def move_tetromino(state: GameState, direction: Direction) -> GameState:
     
     # If moving down and invalid, place the piece
     if direction == Direction.DOWN:
-        new_board = state.board.place_tetromino(state.current_piece)
-        new_board, lines_cleared = new_board.clear_lines()
-        
-        # Update score, level, etc.
-        new_score = state.score + calculate_score(lines_cleared, state.level)
-        new_lines_cleared = state.lines_cleared + lines_cleared
-        new_level = calculate_level(new_lines_cleared)
-        
-        # Check for game over if we need to spawn a new piece
-        game_over = False
-        if state.next_piece is not None:
-            game_over = check_game_over(new_board, state.next_piece.type)
-        
-        return GameState(
-            board=new_board,
-            current_piece=None,  # Will be replaced with next piece
-            next_piece=state.next_piece,
-            held_piece=state.held_piece,
-            score=new_score,
-            level=new_level,
-            lines_cleared=new_lines_cleared,
-            game_over=game_over
-        )
+        return settle_piece(state)
     
     return state
 

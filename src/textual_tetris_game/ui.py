@@ -33,6 +33,16 @@ TETROMINO_COLORS = {
 }
 
 
+def get_cell_style(tetromino_type: TetrominoType | None, is_ghost: bool = False) -> str:
+    """Get the Rich style string for a cell."""
+    if tetromino_type is None:
+        return "  "
+    color = TETROMINO_COLORS.get(tetromino_type, "white")
+    if is_ghost:
+        return f"[{color}]▒▒[/{color}]"
+    return f"[on {color}]  [/on {color}]"
+
+
 class BoardWidget(Static):
     """Widget that displays the Tetris game board."""
     
@@ -59,24 +69,20 @@ class BoardWidget(Static):
         # Fill in the cells from the board state
         for (row, col), tetromino_type in self.board_state.cells.items():
             if 0 <= row < self.board_state.height and 0 <= col < self.board_state.width:
-                color = TETROMINO_COLORS.get(tetromino_type, "white")
-                grid[row][col] = f"[on {color}]  [/on {color}]"
+                grid[row][col] = get_cell_style(tetromino_type)
         
         # Add the ghost piece to the grid
         if self.current_piece is not None:
             ghost_piece = get_ghost_piece(self.board_state, self.current_piece)
-            color = TETROMINO_COLORS.get(self.current_piece.type, "white")
             for cell in ghost_piece.get_cells():
                 if 0 <= cell.row < self.board_state.height and 0 <= cell.col < self.board_state.width:
-                    # Use a shaded character for the ghost piece
-                    grid[cell.row][cell.col] = f"[{color}]▒▒[/{color}]"
+                    grid[cell.row][cell.col] = get_cell_style(self.current_piece.type, is_ghost=True)
         
         # Add the current piece to the grid
         if self.current_piece is not None:
-            color = TETROMINO_COLORS.get(self.current_piece.type, "white")
             for cell in self.current_piece.get_cells():
                 if 0 <= cell.row < self.board_state.height and 0 <= cell.col < self.board_state.width:
-                    grid[cell.row][cell.col] = f"[on {color}]  [/on {color}]"
+                    grid[cell.row][cell.col] = get_cell_style(self.current_piece.type)
         
         # Construct the board string with borders
         board_str = "┌" + "─" * (self.board_state.width * 2) + "┐\n"
@@ -121,12 +127,11 @@ class NextPieceWidget(Static):
             center_row, center_col = 1, 1
         
         # Add the piece to the grid
-        color = TETROMINO_COLORS.get(tetromino_type, "white")
         for row_offset, col_offset in shape:
             row = center_row + row_offset
             col = center_col + col_offset
             if 0 <= row < 2 and 0 <= col < 4:
-                grid[row][col] = f"[on {color}]  [/on {color}]"
+                grid[row][col] = get_cell_style(tetromino_type)
         
         # Construct the preview string
         preview_str = "Next:\n\n"
